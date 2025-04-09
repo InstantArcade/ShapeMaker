@@ -5,8 +5,6 @@ var mXReleased,mYReleased;
 var draggedIndex = -1;
 var curShapeIndex = 0;
 
-// range is 0-11, sub 5.5 to get -5.5 to 5.5
-
 // array of verts - x,y positions
 class vert
 {
@@ -22,15 +20,38 @@ var theVerts = [];
 var numVerts = 0;
 
 // array of faces - list of vert indexes that make each face
-var theShapes = [];
 var numShapes = 0;
 
 var centerTrimX = 0;
 var centerTrimY = 0;
 
+var copybutton,downloadLink;
+
+function copyToClipboard (str) {
+   // Create new element
+   var el = document.createElement('textarea');
+   // Set value (string to be copied)
+   el.value = str;
+   // Set non-editable to avoid focus and move outside of view
+   el.setAttribute('readonly', '');
+   el.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(el);
+   // Select text inside element
+   el.select();
+   // Copy text to clipboard
+   document.execCommand('copy');
+   // Remove temporary element
+   document.body.removeChild(el);
+}
+
 function setup() {
   var c = createCanvas(600, 600);
   c.parent("griddiv");
+  copybutton = createButton('Copy to Clipboard');
+  copybutton.position(310,200);
+  copybutton.mousePressed( () => {
+    var ta=select("#output"); 
+    copyToClipboard(ta.value()); } );
 }
 
 function draw() {
@@ -59,73 +80,83 @@ function draw() {
   fill(188,62,62);
   circle(25+mX*50, 25+mY*50,8);
   
-  var startingShapeIndex = 0;
   var xA = 0;
   var yA = 0;
+    var startingShapeIndex = 0;
   
-  // draw active verts
-  for( var i = 0; i < theVerts.length; i++ )
+  for( var pass = 0; pass < 2; pass++ )
   {
-    noStroke();
-    if( theVerts[i].shapeIndex == curShapeIndex )
-      fill(0,255,0);
-    else
-      fill(0,96,0);
-      
-    circle( 25 + theVerts[i].x*50, 25+ theVerts[i].y*50, 12 );
-    // draw vert number
-    text(i, 30 + theVerts[i].x*50, 20+ theVerts[i].y*50 );
-
-    xA += theVerts[i].x;
-    yA += theVerts[i].y;
-
-    // draw lines between verts?
-    if( theVerts[i].shapeIndex == curShapeIndex )
-      stroke(255);
-    else
-      stroke(96);
-
-    if( i > 0 )
+    
+    for( var i = 0; i < theVerts.length; i++ )
     {
-      if( theVerts[i].shapeIndex == theVerts[i-1].shapeIndex )
-      {
-        var x =  25 + theVerts[i].x * 50;
-        var y =  25 + theVerts[i].y * 50;
-        var x2 = 25 + theVerts[i-1].x * 50;
-        var y2 = 25 + theVerts[i-1].y * 50;
-        line(x,y,x2,y2);
-      }
+      noStroke();
+      
+      if( pass == 1 )
+        fill(0,255,0);
       else
+        fill(0,96,0);
+
+      // pass 0 are verts & lines that are not the current shape
+      // pass 1 are the current shapes verts and lines
+      if( (pass == 0 && theVerts[i].shapeIndex != curShapeIndex) ||
+        (pass == 1 && theVerts[i].shapeIndex == curShapeIndex) )
       {
-         // draw closing line
-        // stroke(255,0,0);
-        if( theVerts[i].shapeIndex == curShapeIndex+1 )
+        circle( 25 + theVerts[i].x*50, 25+ theVerts[i].y*50, 12 );
+        // draw vert number
+        text(i, 30 + theVerts[i].x*50, 20+ theVerts[i].y*50 );
+
+        xA += theVerts[i].x;
+        yA += theVerts[i].y;
+
+        // draw lines between verts?
+        if( theVerts[i].shapeIndex == curShapeIndex )
           stroke(255);
         else
           stroke(96);
-        
-         var x =  25 + theVerts[i-1].x * 50;
-         var y =  25 + theVerts[i-1].y * 50;
-         var x2 = 25 + theVerts[startingShapeIndex].x * 50;
-         var y2 = 25 + theVerts[startingShapeIndex].y * 50;
-         line(x,y,x2,y2);
-        log( "drawing closing line from node " + i + " to node " + startingShapeIndex );
 
-         startingShapeIndex = i;
-      }
-      
-      if( i == theVerts.length-1 ) // last vert
-      {
-          // draw closing line
-          var x =  25 + theVerts[i].x * 50;
-          var y =  25 + theVerts[i].y * 50;
-          var x2 = 25 + theVerts[startingShapeIndex].x * 50;
-          var y2 = 25 + theVerts[startingShapeIndex].y * 50;
-          line(x,y,x2,y2);
-      }   
-    }
-  }
+        if( i > 0 )
+        {
+          if( theVerts[i].shapeIndex == theVerts[i-1].shapeIndex )
+          {
+            var x =  25 + theVerts[i].x * 50;
+            var y =  25 + theVerts[i].y * 50;
+            var x2 = 25 + theVerts[i-1].x * 50;
+            var y2 = 25 + theVerts[i-1].y * 50;
+            line(x,y,x2,y2);
+          }
+          else
+          {
+             // draw closing line
+            // stroke(255,0,0);
+            if( theVerts[i].shapeIndex == curShapeIndex+1 )
+              stroke(255);
+            else
+              stroke(96);
 
+             var x =  25 + theVerts[i-1].x * 50;
+             var y =  25 + theVerts[i-1].y * 50;
+             var x2 = 25 + theVerts[startingShapeIndex].x * 50;
+             var y2 = 25 + theVerts[startingShapeIndex].y * 50;
+             line(x,y,x2,y2);
+            log( "drawing closing line from node " + i + " to node " + startingShapeIndex );
+
+             startingShapeIndex = i;
+          }
+
+          if( i == theVerts.length-1 ) // last vert
+          {
+              // draw closing line
+              var x =  25 + theVerts[i].x * 50;
+              var y =  25 + theVerts[i].y * 50;
+              var x2 = 25 + theVerts[startingShapeIndex].x * 50;
+              var y2 = 25 + theVerts[startingShapeIndex].y * 50;
+              line(x,y,x2,y2);
+          }   
+        } // vert index > 0
+      } // pass filter
+    } // vert loop
+  } // pass loop
+  
   // draw actual center
   if( theVerts.length > 1 )
   {
@@ -153,7 +184,10 @@ function whichNode(x,y)
     {
       if( y == theVerts[i].y )
       {
-        return i;
+        if( curShapeIndex == theVerts[i].shapeIndex )
+        {
+          return i;
+        }
       }
     }
   }
@@ -180,7 +214,7 @@ function dumpTheData( useTrim )
   var vertString = "verts = [\n\t";
   var faceString = "faces = [\n\t";
   
-  var outString = "# Data\n\n";
+  var outString = "";//"# Data\n\n";
   
   var oX = outputOffsetX;
   var oY = outputOffsetX;
@@ -218,10 +252,6 @@ function dumpTheData( useTrim )
   outString += vertString;
   outString += faceString;
   
-  console.log( outString );
-  
-  // save( outString, "data.py" );
-  // console.log(ta.elt);
   ta.value(outString);
 }
 
@@ -246,11 +276,9 @@ function center()
   
   xA = xA/theVerts.length;
   yA = yA/theVerts.length;
-  // console.log("average xy " + xA + "," + yA );
   
   xA = 5.5-(int)((xA));
   yA = 5.5-(int)((yA));
-  // console.log("adjust xy positions by " + xA + "," + yA );
   
   scroll(Math.round(xA-0.5),Math.round(yA-0.5));
 }
@@ -259,7 +287,6 @@ function keyPressed()
 {
   if( key == '=' )
   {
-    // console.log( "Increase curShapeIndex to " + curShapeIndex );
     curShapeIndex++;
   }
   
@@ -320,13 +347,30 @@ function mouseDragged()
   var mYDragged = (int)((mouseY) / 50);
   
   var ni = whichNode(mXDragged,mYDragged);
-  // console.log("NI:"+ni+", draggedIndex:" + draggedIndex);
-  if( /*ni == -1 &&*/ draggedIndex != -1 && theVerts[draggedIndex].shapeIndex == curShapeIndex  )
+  if( draggedIndex != -1 && theVerts[draggedIndex].shapeIndex == curShapeIndex  )
   {
     theVerts[draggedIndex].x = mXDragged;
     theVerts[draggedIndex].y = mYDragged;
+    dumpTheData(false);
   }
 }
+
+function lastNodeInShape( sh )
+{
+  var nodeIndex = -1;
+  for( var i = 0; i < theVerts.length; i++ )
+  {
+    if( theVerts[i].shapeIndex == sh )
+    {
+      nodeIndex = i+1;
+    }
+    else if( theVerts[i].shapeIndex == sh + 1 )
+    {
+       break;
+    }
+   }
+  return nodeIndex;
+ }
 
 function mouseClicked()
 {
@@ -335,18 +379,35 @@ function mouseClicked()
     // if we didn't change selection between pressing and releasing
     if( mXPressed == mXReleased && mYPressed == mYReleased )
     {
-      // if there's not already a node there
       var ni = whichNode( mXReleased, mYReleased );
-      if( ni == -1 ) 
+      var last = lastNodeInShape(curShapeIndex);
+      
+      if( !keyIsDown(SHIFT) )
       {
-        theVerts.push( new vert(mX,mY,curShapeIndex) );
-      }
-      else if( keyIsDown(SHIFT) )// asssume we want to delete that node
+        if( ni == -1 ) // no node in the current shape on this spot
+        {
+          // push or splice?
+          if( last != -1 )
+          {
+            console.log( "inserting a new node at position " + last );
+            theVerts.splice(last,0, new vert(mX,mY,curShapeIndex) );
+
+          }
+          else
+          {
+            console.log( "Pushing a new node at the end of the array" );
+            theVerts.push( new vert(mX,mY,curShapeIndex) );
+          }
+        }
+      }      
+      
+      if( ni != -1 && theVerts[ni].shapeIndex == curShapeIndex && keyIsDown(SHIFT) )// asssume we want to delete that node
       {
         theVerts.splice(ni,1);
       }
     }
-  }  
+  }
+ dumpTheData(false);
 }
 
 function sketch3D(p,data)
