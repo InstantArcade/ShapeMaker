@@ -29,7 +29,8 @@ var centerTrimX = 0;
 var centerTrimY = 0;
 
 function setup() {
-  createCanvas(600, 600);
+  var c = createCanvas(600, 600);
+  c.parent("griddiv");
 }
 
 function draw() {
@@ -174,7 +175,8 @@ var outputOffsetY = -5.5;
 
 function dumpTheData( useTrim )
 {
-  log( "dumpData called!");
+  // log( "dumpData called!");
+  var ta = select("#output");
   var vertString = "verts = [\n\t";
   var faceString = "faces = [\n\t";
   
@@ -218,7 +220,9 @@ function dumpTheData( useTrim )
   
   console.log( outString );
   
-  save( outString, "data.py" );
+  // save( outString, "data.py" );
+  // console.log(ta.elt);
+  ta.value(outString);
 }
 
 function scroll(x,y)
@@ -348,7 +352,8 @@ function mouseClicked()
 function sketch3D(p,data)
 {
   p.setup = function(){
-    p.createCanvas(300,300, p.WEBGL);
+    var c = p.createCanvas(300,300, p.WEBGL);
+    c.parent("3ddiv");
     p.background(128);
     
   };

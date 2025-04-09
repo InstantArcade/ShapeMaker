@@ -2,6 +2,28 @@ html, body {
   margin: 0;
   padding: 0;
 }
-canvas {
+
+/* canvas {
   display: block;
+}
+ */
+
+.topleft
+{
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.topright
+{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.bottom
+{
+  position: absolute;
+  top: 310px;
 }
