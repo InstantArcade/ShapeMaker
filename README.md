@@ -7,4 +7,4 @@ A simple web based utility to create shapes for display in 3D on a matrix panel
 * "+" and "-" move to next/previous shape
 * "c" attempts to center the shape on the grid
 * Cursor keys scroll all nodes
-* "s" outputs the node and face data in Python array format for use in your 3D display
+* "s" outputs the node and face data in Python array format for use in your 3D display (__Note__ You'll need to open the inspector to see the output)
