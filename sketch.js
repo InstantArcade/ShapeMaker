@@ -66,7 +66,11 @@ function draw() {
   for( var i = 0; i < theVerts.length; i++ )
   {
     noStroke();
-    fill(0,255,0);
+    if( theVerts[i].shapeIndex == curShapeIndex )
+      fill(0,255,0);
+    else
+      fill(0,96,0);
+      
     circle( 25 + theVerts[i].x*50, 25+ theVerts[i].y*50, 12 );
     // draw vert number
     text(i, 30 + theVerts[i].x*50, 20+ theVerts[i].y*50 );
@@ -313,7 +317,7 @@ function mouseDragged()
   
   var ni = whichNode(mXDragged,mYDragged);
   // console.log("NI:"+ni+", draggedIndex:" + draggedIndex);
-  if( ni == -1 && draggedIndex != -1  )
+  if( /*ni == -1 &&*/ draggedIndex != -1 && theVerts[draggedIndex].shapeIndex == curShapeIndex  )
   {
     theVerts[draggedIndex].x = mXDragged;
     theVerts[draggedIndex].y = mYDragged;
@@ -333,31 +337,18 @@ function mouseClicked()
       {
         theVerts.push( new vert(mX,mY,curShapeIndex) );
       }
-      else if( keyIsDown(SHIFT) )// asssume we want to deleted that node
+      else if( keyIsDown(SHIFT) )// asssume we want to delete that node
       {
         theVerts.splice(ni,1);
       }
-      // if( theVerts.length > 2 )
-      // {
-      //   var a = [];
-      //   for( var i = 0; i < theVerts.length; i++ )
-      //   {
-      //     a.push(i);
-      //   }
-      //   theShapes[curShapeIndex] = a;
-      // }
     }
   }  
-}
-
-const getData = function()
-{
 }
 
 function sketch3D(p,data)
 {
   p.setup = function(){
-    p.createCanvas(300,300, WEBGL);
+    p.createCanvas(300,300, p.WEBGL);
     p.background(128);
     
   };
