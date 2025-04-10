@@ -242,6 +242,7 @@ function dumpTheData( useTrim )
   }
   // Get all the verts (e.g. 
   var shapeIndex = -1;
+  var startIndex = 0;
   for( var v = 0; v < theVerts.length; v++ )
   {
     vertString += "[" + 
@@ -252,17 +253,18 @@ function dumpTheData( useTrim )
       if( shapeIndex != -1 )
       {
         faceString = faceString.substring(0,faceString.length-1);
-        faceString += "],\n\t";
+        faceString += "," + startIndex + "],\n\t";
       }
       faceString += "[";
       shapeIndex = theVerts[v].shapeIndex;
+      startIndex = v;
     }
     faceString += "" + v + ",";
   }
  
   vertString += "]\n\n";
   faceString = faceString.substring(0,faceString.length-1);
-  faceString += "]\n\t]\n";
+  faceString += "," + startIndex + "]\n\t]\n";
   
   outString += vertString;
   outString += faceString;
