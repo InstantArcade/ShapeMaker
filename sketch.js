@@ -25,7 +25,7 @@ var numShapes = 0;
 var centerTrimX = 0;
 var centerTrimY = 0;
 
-var copybutton,downloadLink;
+var copybutton,clearbutton;
 
 function copyToClipboard (str) {
    // Create new element
@@ -52,6 +52,12 @@ function setup() {
   copybutton.mousePressed( () => {
     var ta=select("#output"); 
     copyToClipboard(ta.value()); } );
+  clearbutton = createButton('Clear');
+  clearbutton.position(560,278);
+  clearbutton.mousePressed( () => {
+    console.log("Clearing all verts");
+    theVerts = [];
+  });
 }
 
 function draw() {
