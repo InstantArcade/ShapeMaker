@@ -1,6 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  bgcolor: black;
 }
 
 /* canvas {
@@ -11,19 +12,21 @@ html, body {
 .topleft
 {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 10px;
+  left: 10px;
 }
 
 .topright
 {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 10px;
+  left: 314px;
 }
 
 .bottom
 {
   position: absolute;
   top: 300px;
+  left: 10px;
 }
+

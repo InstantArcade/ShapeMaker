@@ -48,7 +48,7 @@ function setup() {
   var c = createCanvas(600, 600);
   c.parent("griddiv");
   copybutton = createButton('Copy to Clipboard');
-  copybutton.position(310,200);
+  copybutton.position(314,278);
   copybutton.mousePressed( () => {
     var ta=select("#output"); 
     copyToClipboard(ta.value()); } );
