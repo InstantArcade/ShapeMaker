@@ -88,11 +88,13 @@ function draw() {
   
   var xA = 0;
   var yA = 0;
-    var startingShapeIndex = 0;
+  var startingShapeIndex = 0;
   
   for( var pass = 0; pass < 2; pass++ )
   {
-    
+    var si = -1;
+    if( theVerts[0] ) si = theVerts[0].shapeIndex;
+
     for( var i = 0; i < theVerts.length; i++ )
     {
       noStroke();
@@ -102,10 +104,11 @@ function draw() {
       else
         fill(0,96,0);
 
+      
       // pass 0 are verts & lines that are not the current shape
       // pass 1 are the current shapes verts and lines
       if( (pass == 0 && theVerts[i].shapeIndex != curShapeIndex) ||
-        (pass == 1 && theVerts[i].shapeIndex == curShapeIndex) )
+          (pass == 1 && theVerts[i].shapeIndex == curShapeIndex) )
       {
         circle( 25 + theVerts[i].x*50, 25+ theVerts[i].y*50, 12 );
         // draw vert number
@@ -114,14 +117,14 @@ function draw() {
         xA += theVerts[i].x;
         yA += theVerts[i].y;
 
-        // draw lines between verts?
-        if( theVerts[i].shapeIndex == curShapeIndex )
-          stroke(255);
-        else
-          stroke(96);
-
         if( i > 0 )
         {
+          // currently selected shape is white, others are grey
+          if( theVerts[i-1].shapeIndex == curShapeIndex )
+            stroke(255);
+          else
+            stroke(96);
+          // still on same shape?
           if( theVerts[i].shapeIndex == theVerts[i-1].shapeIndex )
           {
             var x =  25 + theVerts[i].x * 50;
@@ -130,38 +133,44 @@ function draw() {
             var y2 = 25 + theVerts[i-1].y * 50;
             line(x,y,x2,y2);
           }
-          else
+          else // current shape ended
           {
-             // draw closing line
-            // stroke(255,0,0);
-            if( theVerts[i].shapeIndex == curShapeIndex+1 )
-              stroke(255);
-            else
-              stroke(96);
-
+             // find starting shape index for current shape
+            var ss = 0;
+            for( var j = i-1; j>=0; j-- )
+            {
+              if( theVerts[j].shapeIndex != theVerts[i-1].shapeIndex )
+              {
+                ss = j+1;
+                break;
+              }
+            }
+             // draw closing line of previous shape
              var x =  25 + theVerts[i-1].x * 50;
              var y =  25 + theVerts[i-1].y * 50;
-             var x2 = 25 + theVerts[startingShapeIndex].x * 50;
-             var y2 = 25 + theVerts[startingShapeIndex].y * 50;
+             var x2 = 25 + theVerts[ss].x * 50;
+             var y2 = 25 + theVerts[ss].y * 50;
              line(x,y,x2,y2);
-            log( "drawing closing line from node " + i + " to node " + startingShapeIndex );
+            // console.log( "drawing closing line from node " + (i-1) + " to node " + si );
 
-             startingShapeIndex = i;
+             si = i;
           }
 
-          if( i == theVerts.length-1 ) // last vert
+          if( i == theVerts.length-1 ) // last vert in entire array
           {
               // draw closing line
               var x =  25 + theVerts[i].x * 50;
               var y =  25 + theVerts[i].y * 50;
-              var x2 = 25 + theVerts[startingShapeIndex].x * 50;
-              var y2 = 25 + theVerts[startingShapeIndex].y * 50;
+              var x2 = 25 + theVerts[si].x * 50;
+              var y2 = 25 + theVerts[si].y * 50;
               line(x,y,x2,y2);
+            // console.log( "drawing last line from " + i + " to " +si );
           }   
         } // vert index > 0
       } // pass filter
     } // vert loop
   } // pass loop
+  // console.log("done\n\n");
   
   // draw actual center
   if( theVerts.length > 1 )
@@ -395,13 +404,13 @@ function mouseClicked()
           // push or splice?
           if( last != -1 )
           {
-            console.log( "inserting a new node at position " + last );
+            // console.log( "inserting a new node at position " + last );
             theVerts.splice(last,0, new vert(mX,mY,curShapeIndex) );
 
           }
           else
           {
-            console.log( "Pushing a new node at the end of the array" );
+            // console.log( "Pushing a new node at the end of the array" );
             theVerts.push( new vert(mX,mY,curShapeIndex) );
           }
         }
