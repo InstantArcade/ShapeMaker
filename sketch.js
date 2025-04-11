@@ -19,6 +19,7 @@ class vert
 
 var theVerts = [];
 var numVerts = 0;
+var outVerts = [];
 
 // array of faces - list of vert indexes that make each face
 var numShapes = 0;
@@ -89,8 +90,16 @@ function setup() {
   buttonThickness = createImg('line_weight.svg', 'Thickness');
   buttonThickness.position(440,278);
   buttonThickness.mousePressed( ()=>{
-    depth += 10;
-    if( depth > 50 ) depth = 10;
+    if( !keyIsDown(SHIFT) )
+    {
+      depth += 2.5;
+      if( depth > 50 ) depth = 2.5;
+    }
+    else
+    {
+      depth -= 2.5;
+      if( depth < 2.5 ) depth = 50;
+    }
   });
 }
 
@@ -281,12 +290,44 @@ function dumpTheData( useTrim )
   // Get all the verts (e.g. 
   var shapeIndex = -1;
   var startIndex = 0;
-  for( var v = 0; v < theVerts.length; v++ )
+  var d = depth * 0.05;
+  
+  numVerts = theVerts.length;
+  var numShapes = 0;
+  var sic = -1;
+  outVerts = [];
+  for( var i=0; i < numVerts; i++ )
   {
+    if( theVerts[i].shapeIndex != sic )
+    {
+      numShapes++;
+      sic = theVerts[i].shapeIndex;
+    }
+    outVerts.push( theVerts[i] );
+  }
+  
+  if( is3D )
+  {
+    for( var ic=0; ic < numVerts; ic++ )
+    {
+      outVerts.push( 
+        new vert( theVerts[ic].x, 
+                 theVerts[ic].y, 
+                 7,//d * -1.0, 
+                 theVerts[ic].shapeIndex + numShapes ) 
+        );
+    }  
+  }  
+  
+  var dout = d;
+  
+  for( var v = 0; v < outVerts.length; v++ )
+  {
+    if( v >= theVerts.length ) dout = d * -1;
     vertString += "[" + 
-      (theVerts[v].x+oX) + "," + 
-      (theVerts[v].y+oY) + ",0.0],\n\t"; 
-    if( theVerts[v].shapeIndex != shapeIndex ) // new face
+      (outVerts[v].x+oX) + "," + 
+      (outVerts[v].y+oY) + "," + dout + "],#"+v+"\n\t"; 
+    if( outVerts[v].shapeIndex != shapeIndex ) // new face
     {
       if( shapeIndex != -1 )
       {
@@ -294,15 +335,25 @@ function dumpTheData( useTrim )
         faceString += "," + startIndex + "],\n\t";
       }
       faceString += "[";
-      shapeIndex = theVerts[v].shapeIndex;
+      shapeIndex = outVerts[v].shapeIndex;
       startIndex = v;
     }
     faceString += "" + v + ",";
   }
- 
+  
   vertString += "]\n\n";
   faceString = faceString.substring(0,faceString.length-1);
-  faceString += "," + startIndex + "]\n\t]\n";
+  faceString += "," + startIndex + "],";
+  
+  // if 3D, finally connect all front nodes to back nodes
+  if( is3D )
+  {
+    for( var i = 0; i < numVerts; i++ )
+    {
+      faceString += "\n\t[" + (i+numVerts) +"," + i + "],";
+    }
+  }
+    faceString += "\n\t]";
   
   outString += vertString;
   outString += faceString;
@@ -465,7 +516,7 @@ function mouseClicked()
  dumpTheData(false);
 }
 
-var depth = 10;
+var depth = 2.5;
 
 function sketch3D(p,data)
 {
@@ -496,11 +547,6 @@ function sketch3D(p,data)
       depth *= -1;
       for( var i = 0; i < theVerts.length; i++ )
       {
-        //p.circle(theVerts[i].x*10,theVerts[i].y*10,6);
-        // p.push();
-        // p.translate((theVerts[i].x-5.5)*10,(theVerts[i].y-5.5)*10,0);
-        // p.sphere(2);
-        // p.pop();
         var x = (theVerts[i].x-5.5)*scale;
         var y = (theVerts[i].y-5.5)*scale;
         p.circle(x,y,5);
@@ -508,9 +554,6 @@ function sketch3D(p,data)
         {
           if( theVerts[i].shapeIndex == theVerts[i-1].shapeIndex )
           {
-            // var x1 = (theVerts[i].x-5.5)*10;
-            // var y1 = (theVerts[i].y-5.5)*10;
-            // p.line( x, y, x1, y1 );
             p.line(
               (theVerts[i].x-5.5)*scale,
               (theVerts[i].y-5.5)*scale,
