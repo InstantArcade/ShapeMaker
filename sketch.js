@@ -4,6 +4,7 @@ var mXPressed,mYPressed;
 var mXReleased,mYReleased;
 var draggedIndex = -1;
 var curShapeIndex = 0;
+var is3D = true;
 
 // array of verts - x,y positions
 class vert
@@ -26,6 +27,7 @@ var centerTrimX = 0;
 var centerTrimY = 0;
 
 var copybutton,clearbutton;
+var button3D,button2D,buttonThickness;
 
 function copyToClipboard (str) {
    // Create new element
@@ -47,17 +49,48 @@ function copyToClipboard (str) {
 function setup() {
   var c = createCanvas(600, 600);
   c.parent("griddiv");
-  copybutton = createButton('Copy to Clipboard');
+  
+  copybutton = createImg('copy.svg', 'Copy to clipboard');
+  //createButton('Copy to Clipboard');
   copybutton.position(314,278);
   copybutton.mousePressed( () => {
     var ta=select("#output"); 
     copyToClipboard(ta.value()); } );
-  clearbutton = createButton('Clear');
-  clearbutton.position(560,278);
+  
+  clearbutton = createImg('delete.svg','Delete');
+    //createButton('Clear');
+  clearbutton.position(360,278);
   clearbutton.mousePressed( () => {
     console.log("Clearing all verts");
     theVerts = [];
     curShapeIndex = 0;
+  });
+  
+  button3D = createImg('3d.svg','3D');
+  button3D.position(400,278);
+  button3D.mousePressed( ()=>{
+    is3D = true; 
+    button3D.hide();
+    button2D.show();
+    buttonThickness.show();
+    depth = 10;
+  });
+  button3D.hide();
+  
+  button2D = createImg('2d.svg','3D');
+  button2D.position(400,278);
+  button2D.mousePressed( ()=>{
+    is3D = false; 
+    button2D.hide();
+    button3D.show();
+    buttonThickness.hide();
+  });
+  
+  buttonThickness = createImg('line_weight.svg', 'Thickness');
+  buttonThickness.position(440,278);
+  buttonThickness.mousePressed( ()=>{
+    depth += 10;
+    if( depth > 50 ) depth = 10;
   });
 }
 
@@ -432,6 +465,8 @@ function mouseClicked()
  dumpTheData(false);
 }
 
+var depth = 10;
+
 function sketch3D(p,data)
 {
   p.setup = function(){
@@ -447,8 +482,13 @@ function sketch3D(p,data)
     p.stroke(255);
     
     var scale = 22;
-    var depth = 10;
-    for( var s = 0; s < 2; s++ )
+    var passes = 2;
+    if( !is3D )
+    {
+      passes = 1;
+      depth = 0;
+    }
+    for( var s = 0; s < passes; s++ )
     {
       var startingShapeIndex = 0;
       p.push();
