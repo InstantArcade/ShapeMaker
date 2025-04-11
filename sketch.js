@@ -313,7 +313,6 @@ function dumpTheData( useTrim )
       outVerts.push( 
         new vert( theVerts[ic].x, 
                  theVerts[ic].y, 
-                 7,//d * -1.0, 
                  theVerts[ic].shapeIndex + numShapes ) 
         );
     }  
@@ -326,13 +325,25 @@ function dumpTheData( useTrim )
     if( v >= theVerts.length ) dout = d * -1;
     vertString += "[" + 
       (outVerts[v].x+oX) + "," + 
-      (outVerts[v].y+oY) + "," + dout + "],#"+v+"\n\t"; 
+      (outVerts[v].y+oY) + "," + dout + "],#"+v;
+    if( is3D )
+      if( v < numVerts )
+          vertString += " Front";
+      else
+          vertString += " Back";
+    vertString += "\n\t"; 
     if( outVerts[v].shapeIndex != shapeIndex ) // new face
     {
       if( shapeIndex != -1 )
       {
         faceString = faceString.substring(0,faceString.length-1);
-        faceString += "," + startIndex + "],\n\t";
+        faceString += "," + startIndex + "],";
+        if( is3D )
+          if( v <= numVerts )
+              faceString += "# Front";
+          else
+              faceString += "# Back";
+        faceString += "\n\t";
       }
       faceString += "[";
       shapeIndex = outVerts[v].shapeIndex;
@@ -344,6 +355,8 @@ function dumpTheData( useTrim )
   vertString += "]\n\n";
   faceString = faceString.substring(0,faceString.length-1);
   faceString += "," + startIndex + "],";
+  if( is3D )
+        faceString += "# Back";
   
   // if 3D, finally connect all front nodes to back nodes
   if( is3D )
