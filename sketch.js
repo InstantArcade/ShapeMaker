@@ -57,6 +57,7 @@ function setup() {
   clearbutton.mousePressed( () => {
     console.log("Clearing all verts");
     theVerts = [];
+    curShapeIndex = 0;
   });
 }
 
@@ -156,15 +157,19 @@ function draw() {
              si = i;
           }
 
-          if( i == theVerts.length-1 ) // last vert in entire array
+          if( i == theVerts.length-1 && si != -1 ) // last vert in entire array
           {
               // draw closing line
+            if( theVerts[i] && theVerts[si] )
+            {
               var x =  25 + theVerts[i].x * 50;
               var y =  25 + theVerts[i].y * 50;
               var x2 = 25 + theVerts[si].x * 50;
               var y2 = 25 + theVerts[si].y * 50;
               line(x,y,x2,y2);
+              
             // console.log( "drawing last line from " + i + " to " +si );
+            }
           }   
         } // vert index > 0
       } // pass filter
