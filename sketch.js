@@ -4,7 +4,7 @@ var mXPressed,mYPressed;
 var mXReleased,mYReleased;
 var draggedIndex = -1;
 var curShapeIndex = 0;
-var is3D = true;
+var is3D = false;
 
 // array of verts - x,y positions
 class vert
@@ -29,6 +29,7 @@ var centerTrimY = 0;
 
 var copybutton,clearbutton;
 var button3D,button2D,buttonThickness;
+var thicknessSlider;
 
 function copyToClipboard (str) {
    // Create new element
@@ -47,10 +48,35 @@ function copyToClipboard (str) {
    document.body.removeChild(el);
 }
 
+function setButtons()
+{
+  if( is3D )
+  {
+    button3D.hide();
+    button2D.show();
+    // buttonThickness.show();
+    thicknessSlider.show();
+    thicknessSlider.value(depth);
+  }
+  else
+  {
+    button2D.hide();
+    button3D.show();
+    // buttonThickness.hide();
+    thicknessSlider.hide();
+  }
+}
+
 function setup() {
   var c = createCanvas(600, 600);
   c.parent("griddiv");
-  
+  depth = 10;
+
+  thicknessSlider = createSlider(2.5,50);
+  thicknessSlider.position(460,278);
+  thicknessSlider.size(150);
+  thicknessSlider.value(depth);
+
   copybutton = createImg('copy.svg', 'Copy to clipboard');
   //createButton('Copy to Clipboard');
   copybutton.position(314,278);
@@ -70,41 +96,39 @@ function setup() {
   button3D = createImg('3d.svg','3D');
   button3D.position(400,278);
   button3D.mousePressed( ()=>{
-    is3D = true; 
-    button3D.hide();
-    button2D.show();
-    buttonThickness.show();
-    depth = 10;
+    is3D = true;
+    setButtons();
   });
   button3D.hide();
   
-  button2D = createImg('2d.svg','3D');
+  button2D = createImg('2d.svg','2D');
   button2D.position(400,278);
   button2D.mousePressed( ()=>{
     is3D = false; 
-    button2D.hide();
-    button3D.show();
-    buttonThickness.hide();
+    setButtons();
   });
   
-  buttonThickness = createImg('line_weight.svg', 'Thickness');
-  buttonThickness.position(440,278);
-  buttonThickness.mousePressed( ()=>{
-    if( !keyIsDown(SHIFT) )
-    {
-      depth += 2.5;
-      if( depth > 50 ) depth = 2.5;
-    }
-    else
-    {
-      depth -= 2.5;
-      if( depth < 2.5 ) depth = 50;
-    }
-  });
+  // buttonThickness = createImg('line_weight.svg', 'Thickness');
+  // buttonThickness.position(440,278);
+  // buttonThickness.mousePressed( ()=>{
+  //   if( !keyIsDown(SHIFT) )
+  //   {
+  //     depth += 2.5;
+  //     if( depth > 50 ) depth = 2.5;
+  //   }
+  //   else
+  //   {
+  //     depth -= 2.5;
+  //     if( depth < 2.5 ) depth = 50;
+  //   }
+  // });
+ 
+  setButtons();
 }
 
 function draw() {
   background(20);
+  depth = thicknessSlider.value();
   
   stroke(255,0,0,64);
   strokeWeight(1);
