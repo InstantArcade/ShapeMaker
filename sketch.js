@@ -349,7 +349,7 @@ function dumpTheData( useTrim )
     if( v >= theVerts.length ) dout = d * -1;
     vertString += "[" + 
       (outVerts[v].x+oX) + "," + 
-      (outVerts[v].y+oY) + "," + dout + "],#"+v;
+      (outVerts[v].y+oY) + "," + dout.toFixed(3) + "],#"+v;
     if( is3D )
       if( v < numVerts )
           vertString += " Front";
